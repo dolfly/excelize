@@ -25,7 +25,6 @@ Security reports are greatly appreciated and we will publicly thank you for it.
 We currently do not offer a paid security bounty program, but are not
 ruling it out in the future.
 
-
 ## Reporting other issues
 
 A great way to contribute to the project is to send a detailed report when you
@@ -44,7 +43,7 @@ When reporting issues, always include the output of `go env`.
 
 Also include the steps required to reproduce the problem if possible and
 applicable. This information will help us review and fix your issue faster.
-When sending lengthy log-files, consider posting them as a gist (https://gist.github.com).
+When sending lengthy log-files, consider posting them as a gist [https://gist.github.com](https://gist.github.com).
 Don't forget to remove sensitive data from your logfiles before posting (you can
 replace those parts with "REDACTED").
 
@@ -77,9 +76,9 @@ However, there might be a way to implement that feature *on top of* excelize.
 
 Fork the repository and make changes on your fork in a feature branch:
 
-- If it's a bug fix branch, name it XXXX-something where XXXX is the number of
+* If it's a bug fix branch, name it XXXX-something where XXXX is the number of
     the issue.
-- If it's a feature branch, create an enhancement issue to announce
+* If it's a feature branch, create an enhancement issue to announce
     your intentions, and name it XXXX-something where XXXX is the number of the
     issue.
 
@@ -194,7 +193,7 @@ signature certifies that you wrote the patch or otherwise have the right to pass
 it on as an open-source patch. The rules are pretty simple: if you can certify
 the below (from [developercertificate.org](http://developercertificate.org/)):
 
-```
+```text
 Developer Certificate of Origin
 Version 1.1
 
@@ -235,21 +234,23 @@ By making a contribution to this project, I certify that:
 
 Then you just add a line to every git commit message:
 
-    Signed-off-by: Ri Xu https://xuri.me
+```text
+Signed-off-by: Ri Xu https://xuri.me
+```
 
 Use your real name (sorry, no pseudonyms or anonymous contributions.)
 
 If you set your `user.name` and `user.email` git configs, you can sign your
 commit automatically with `git commit -s`.
 
-### How can I become a maintainer?
+### How can I become a maintainer
 
 First, all maintainers have 3 things
 
-- They share responsibility in the project's success.
-- They have made a long-term, recurring time investment to improve the project.
-- They spend that time doing whatever needs to be done, not necessarily what
-is the most interesting or fun.
+* They share responsibility in the project's success.
+* They have made a long-term, recurring time investment to improve the project.
+* They spend that time doing whatever needs to be done, not necessarily what
+ is the most interesting or fun.
 
 Maintainers are often under-appreciated, because their work is harder to appreciate.
 It's easy to appreciate a really cool and technically advanced feature. It's harder
@@ -374,3 +375,91 @@ If you are having trouble getting into the mood of idiomatic Go, we recommend
 reading through [Effective Go](https://golang.org/doc/effective_go.html). The
 [Go Blog](https://blog.golang.org) is also a great resource. Drinking the
 kool-aid is a lot easier than going thirsty.
+
+## Code Review Comments and Effective Go Guidelines
+
+[CodeLingo](https://codelingo.io) automatically checks every pull request against the following guidelines from [Effective Go](https://golang.org/doc/effective_go.html) and [Code Review Comments](https://github.com/golang/go/wiki/CodeReviewComments).
+
+### Package Comment
+
+Every package should have a package comment, a block comment preceding the package clause.
+For multi-file packages, the package comment only needs to be present in one file, and any one will do.
+The package comment should introduce the package and provide information relevant to the package as a
+whole. It will appear first on the godoc page and should set up the detailed documentation that follows.
+
+### Single Method Interface Name
+
+By convention, one-method interfaces are named by the method name plus an -er suffix
+or similar modification to construct an agent noun: Reader, Writer, Formatter, CloseNotifier etc.
+
+There are a number of such names and it's productive to honor them and the function names they capture.
+Read, Write, Close, Flush, String and so on have canonical signatures and meanings. To avoid confusion,
+don't give your method one of those names unless it has the same signature and meaning. Conversely,
+if your type implements a method with the same meaning as a method on a well-known type, give it the
+same name and signature; call your string-converter method String not ToString.
+
+### Avoid Annotations in Comments
+
+Comments do not need extra formatting such as banners of stars. The generated output
+may not even be presented in a fixed-width font, so don't depend on spacing for alignment—godoc,
+like gofmt, takes care of that. The comments are uninterpreted plain text, so HTML and other
+annotations such as _this_ will reproduce verbatim and should not be used. One adjustment godoc
+does do is to display indented text in a fixed-width font, suitable for program snippets.
+The package comment for the fmt package uses this to good effect.
+
+### Comment First Word as Subject
+
+Doc comments work best as complete sentences, which allow a wide variety of automated presentations.
+The first sentence should be a one-sentence summary that starts with the name being declared.
+
+### Good Package Name
+
+It's helpful if everyone using the package can use the same name
+to refer to its contents, which implies that the package name should
+be good: short, concise, evocative. By convention, packages are
+given lower case, single-word names; there should be no need for
+underscores or mixedCaps. Err on the side of brevity, since everyone
+using your package will be typing that name. And don't worry about
+collisions a priori. The package name is only the default name for
+imports; it need not be unique across all source code, and in the
+rare case of a collision the importing package can choose a different
+name to use locally. In any case, confusion is rare because the file
+name in the import determines just which package is being used.
+
+### Avoid Renaming Imports
+
+Avoid renaming imports except to avoid a name collision; good package names
+should not require renaming. In the event of collision, prefer to rename the
+most local or project-specific import.
+
+### Context as First Argument
+
+Values of the context.Context type carry security credentials, tracing information,
+deadlines, and cancellation signals across API and process boundaries. Go programs
+pass Contexts explicitly along the entire function call chain from incoming RPCs
+and HTTP requests to outgoing requests.
+
+Most functions that use a Context should accept it as their first parameter.
+
+### Do Not Discard Errors
+
+Do not discard errors using _ variables. If a function returns an error,
+check it to make sure the function succeeded. Handle the error, return it, or,
+in truly exceptional situations, panic.
+
+### Go Error Format
+
+Error strings should not be capitalized (unless beginning with proper nouns
+or acronyms) or end with punctuation, since they are usually printed following
+other context. That is, use fmt.Errorf("something bad") not fmt.Errorf("Something bad"),
+so that log.Printf("Reading %s: %v", filename, err) formats without a spurious
+capital letter mid-message. This does not apply to logging, which is implicitly
+line-oriented and not combined inside other messages.
+
+### Use Crypto Rand
+
+Do not use package math/rand to generate keys, even
+throwaway ones. Unseeded, the generator is completely predictable.
+Seeded with time.Nanoseconds(), there are just a few bits of entropy.
+Instead, use crypto/rand's Reader, and if you need text, print to
+hexadecimal or base64.
